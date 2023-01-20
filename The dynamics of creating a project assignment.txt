@@ -1,0 +1,34 @@
+The dynamics of creating a project assignment - draft
+
+Day 1
+1. Architecture (2h)
+2. Database schema (2h)
+3. Defining the model (1h)
+4. Implementation of model (3h)
+
+Day 2
+0. Getting familiar with the Postgres database (2h)
+1. Loading from files into the database (4h)
+2. Implementation of the repository - admin (2h)
+
+Day 3
+1. Implementation of the repository - employee (2h)
+2. Implementation of the service layer - admin (3h)
+3. Implementation of the service layer - employee (3h)
+
+Day 4
+1. Controller implementation - admin (4h)
+2. Controller implementation - employee (4h)
+
+Day 5
+1. Getting familiar with the integration testing (4h)
+2. Creation of integration tests 1/2 (4h)
+
+Day 6
+1. Creation of integration tests 2/2 (4h)
+2. Spring security and auth (4h)
+
+Day 7
+1. Bug fixing
+2. Solution testing
+3. Writing reports and instructions
