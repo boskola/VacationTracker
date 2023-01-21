@@ -7,14 +7,16 @@ Day 1
 4. Implementation of model (3h)
 
 Day 2
-0. Getting familiar with the Postgres database (2h)
-1. Loading from files into the database (4h)
-2. Implementation of the repository - admin (2h)
+0. Getting familiar with the Postgres database (1h)
+1. Loading from files into the database (3h)
+2. Data validation (2h)
+3. Implementation of the repository - admin (2h)
 
 Day 3
 1. Implementation of the repository - employee (2h)
-2. Implementation of the service layer - admin (3h)
-3. Implementation of the service layer - employee (3h)
+2. Implementation of the service layer - admin (2h)
+3. Implementation of the service layer - employee (2h)
+4. Data validation (2h)
 
 Day 4
 1. Controller implementation - admin (4h)
