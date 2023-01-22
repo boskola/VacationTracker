@@ -42,6 +42,14 @@ public class UserEntity {
 	
 	public UserEntity() {}
 
+	public UserEntity(Long id, String userEmail, String userPassword, Role role) {
+		super();
+		this.id = id;
+		this.userEmail = userEmail;
+		this.userPassword = userPassword;
+		this.role = role;
+	}
+
 	public UserEntity(String userEmail, String userPassword, Role role) {
 		super();
 		this.userEmail = userEmail;

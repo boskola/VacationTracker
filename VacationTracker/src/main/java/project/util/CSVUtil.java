@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,10 +17,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import project.enumeration.Role;
+import project.model.UsedVacation;
 import project.model.UserEntity;
+import project.repository.UserRepository;
 
 public class CSVUtil {
-
+	
 	public static String TYPE = "text/csv";
 
 	public static boolean hasCSVFormat(MultipartFile file) {
@@ -29,7 +34,7 @@ public class CSVUtil {
 		return true;
 	}
 	  
-	public static List<UserEntity> csvToUsers(InputStream is, PasswordEncoder passwordEncoder) {
+	public List<UserEntity> csvToUsers(InputStream is, PasswordEncoder passwordEncoder) {
 		  
 		  try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))){
 			  fileReader.readLine();
@@ -45,7 +50,7 @@ public class CSVUtil {
 			              csvRecord.get("Employee Email"),
 			              passwordEncoder.encode(csvRecord.get("Employee Password")),
 			              Role.EMPLOYEE);
-		
+			    	  
 			    	  users.add(user);
 			      }
 		      
@@ -61,4 +66,47 @@ public class CSVUtil {
 			  throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
 		  }
 	}
+	
+	public List<UsedVacation> csvToUsedVacation(InputStream is, UserRepository userRepository) {
+		  
+		  try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))){
+			 
+			  try (CSVParser csvParser = new CSVParser(fileReader,
+		            CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())){
+				  
+		  	      List<UsedVacation> usedVacation = new ArrayList<UsedVacation>();
+			      Iterable<CSVRecord> csvRecords = csvParser.getRecords();
+			      
+			      for (CSVRecord csvRecord : csvRecords) {
+			    	  UsedVacation oneUsedVacation=null;
+
+			    	  oneUsedVacation = new UsedVacation(
+				              
+				              getLocalDate(csvRecord.get("Vacation start date")),
+				              getLocalDate(csvRecord.get("Vacation end date")),
+				              userRepository.findByUserEmail(csvRecord.get("Employee")).get());
+
+			    	  usedVacation.add(oneUsedVacation);
+			      }
+		      
+			      return usedVacation;
+			  }
+			  
+			  catch (IOException e) {
+				  throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
+			  }
+		  } 
+		  
+		  catch (IOException e) {
+			  throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
+		  }
+	}
+	
+    private LocalDate getLocalDate(String stringDate) throws DateTimeParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
+        LocalDate date = LocalDate.parse(stringDate, formatter);
+        
+        return date;
+    }
+
 }

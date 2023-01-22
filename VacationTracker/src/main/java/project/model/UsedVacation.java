@@ -1,6 +1,6 @@
 package project.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -18,15 +18,29 @@ public class UsedVacation {
 	private Long id;
 	
 	@Column(nullable = false)
-	private LocalDateTime vacationStartDate;
+	private LocalDate vacationStartDate;
 	
 	@Column(nullable = false)
-	private LocalDateTime vacationEndDate;
+	private LocalDate vacationEndDate;
 	
 	@ManyToOne
 	private UserEntity user;
 	
 	public UsedVacation() {}
+
+	public UsedVacation(LocalDate vacationStartDate, LocalDate vacationEndDate, UserEntity user) {
+		super();
+		this.vacationStartDate = vacationStartDate;
+		this.vacationEndDate = vacationEndDate;
+		this.user = user;
+	}
+	
+	public UsedVacation(LocalDate vacationStartDate, LocalDate vacationEndDate) {
+		super();
+		this.vacationStartDate = vacationStartDate;
+		this.vacationEndDate = vacationEndDate;
+		this.user = null;
+	}
 
 	public Long getId() {
 		return id;
@@ -36,19 +50,19 @@ public class UsedVacation {
 		this.id = id;
 	}
 
-	public LocalDateTime getVacationStartDate() {
+	public LocalDate getVacationStartDate() {
 		return vacationStartDate;
 	}
 
-	public void setVacationStartDate(LocalDateTime vacationStartDate) {
+	public void setVacationStartDate(LocalDate vacationStartDate) {
 		this.vacationStartDate = vacationStartDate;
 	}
 
-	public LocalDateTime getVacationEndDate() {
+	public LocalDate getVacationEndDate() {
 		return vacationEndDate;
 	}
 
-	public void setVacationEndDate(LocalDateTime vacationEndDate) {
+	public void setVacationEndDate(LocalDate vacationEndDate) {
 		this.vacationEndDate = vacationEndDate;
 	}
 

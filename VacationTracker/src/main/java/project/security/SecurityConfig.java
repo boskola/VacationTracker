@@ -18,11 +18,7 @@ public class SecurityConfig {
 
     private JwtAuthEntryPoint authEntryPoint;
     
-    private CustomUserDetailsService userDetailsService;
-    
-    
     public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthEntryPoint authEntryPoint) {
-        this.userDetailsService = userDetailsService;
         this.authEntryPoint = authEntryPoint;
     }
 
@@ -39,7 +35,8 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/csv/upload").hasAuthority("ADMIN")
+                .requestMatchers("/api/admin/importEmployees").hasAuthority("ADMIN")
+                .requestMatchers("/api/admin/importUsedVacation").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();
