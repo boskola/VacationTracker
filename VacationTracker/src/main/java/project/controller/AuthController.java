@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import project.dto.AuthResponseDTO;
-import project.dto.LoginDto;
+import project.dto.LoginDTO;
 import project.repository.UserRepository;
 import project.security.JWTGenerator;
 
@@ -37,7 +37,7 @@ public class AuthController {
     }
     
     @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDto){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                 loginDto.getUserEmail(),
