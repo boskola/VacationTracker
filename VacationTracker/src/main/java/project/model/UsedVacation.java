@@ -24,7 +24,7 @@ public class UsedVacation {
 	private LocalDateTime vacationEndDate;
 	
 	@ManyToOne
-	private User user;
+	private UserEntity user;
 	
 	public UsedVacation() {}
 
@@ -52,11 +52,11 @@ public class UsedVacation {
 		this.vacationEndDate = vacationEndDate;
 	}
 
-	public User getUser() {
+	public UserEntity getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(UserEntity user) {
 		this.user = user;
 	}
 

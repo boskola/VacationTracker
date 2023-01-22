@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import project.message.ResponseMessage;
-import project.model.User;
+import project.model.UserEntity;
 import project.service.CSVService;
 import project.util.CSVUtil;
 
@@ -24,14 +25,17 @@ public class CSVController {
 
 	@Autowired
 	CSVService fileService;
+	
+	@Autowired
+	PasswordEncoder passwordEncoder;
 
-	@PostMapping("/initialUpload")
+	@PostMapping("/upload")
 	public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
 		String message = "";
 
 		if (CSVUtil.hasCSVFormat(file)) {
 			try {
-				fileService.save(file);
+				fileService.save(file, passwordEncoder);
 
 				message = "Uploaded the file successfully: " + file.getOriginalFilename();
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
@@ -46,9 +50,9 @@ public class CSVController {
 	}
 
 	@GetMapping("/users")
-	public ResponseEntity<List<User>> getAllUsers() {
+	public ResponseEntity<List<UserEntity>> getAllUsers() {
 		try {
-			List<User> users = fileService.getAllUsers();
+			List<UserEntity> users = fileService.getAllUsers();
 
 			if (users.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);

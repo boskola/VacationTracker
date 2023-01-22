@@ -17,7 +17,7 @@ import project.enumeration.Role;
 
 @Entity
 @Table(name="users")
-public class User {
+public class UserEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +38,9 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<UsedVacation> usedVacations = new ArrayList<>();
 	
-	public User() {}
+	public UserEntity() {}
 
-	public User(String userEmail, String userPassword, Role role) {
+	public UserEntity(String userEmail, String userPassword, Role role) {
 		super();
 		this.userEmail = userEmail;
 		this.userPassword = userPassword;
@@ -108,7 +108,7 @@ public class User {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		User other = (User) obj;
+		UserEntity other = (UserEntity) obj;
 		return Objects.equals(id, other.id);
 	}
 

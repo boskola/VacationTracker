@@ -23,7 +23,7 @@ public class Vacation {
 	private int vacationYear;
 	
 	@ManyToOne
-	private User user;
+	private UserEntity user;
 	
 	public Vacation() {}
 
@@ -51,11 +51,11 @@ public class Vacation {
 		this.vacationYear = vacationYear;
 	}
 
-	public User getUser() {
+	public UserEntity getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(UserEntity user) {
 		this.user = user;
 	}
 
