@@ -1,6 +1,6 @@
 package project.dto;
 
-public class LoginDto {
+public class LoginDTO {
 	
     private String userEmail;
     
