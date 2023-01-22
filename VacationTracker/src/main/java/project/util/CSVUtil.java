@@ -39,19 +39,12 @@ public class CSVUtil {
 		  	      List<UserEntity> users = new ArrayList<UserEntity>();
 			      Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 		      
-			      int i=0;
 			      for (CSVRecord csvRecord : csvRecords) {
-			    	  
-			    	  Role role = Role.EMPLOYEE;
-			    	  
-			    	  if (i<2)
-			    		  role=Role.ADMIN;
 			    	  
 			    	  UserEntity user = new UserEntity(
 			              csvRecord.get("Employee Email"),
 			              passwordEncoder.encode(csvRecord.get("Employee Password")),
-			              role);
-			    	  i++;
+			              Role.EMPLOYEE);
 		
 			    	  users.add(user);
 			      }

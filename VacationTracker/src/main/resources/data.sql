@@ -1,0 +1,1 @@
+INSERT INTO users (user_email, user_password, role) VALUES ('bosko@rbt.bb','$2a$12$oCozgT6psOyZKniV1300OuHC6RanY0Div9..BAfYSxn/jHP810gRG', 'ADMIN');
