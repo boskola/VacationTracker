@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.enumeration.Role;
 import project.model.UsedVacation;
 import project.model.UserEntity;
+import project.model.Vacation;
 import project.repository.UserRepository;
 
 public class CSVUtil {
@@ -30,7 +31,6 @@ public class CSVUtil {
 		if (!TYPE.equals(file.getContentType())) {
 			return false;
 		}
-	
 		return true;
 	}
 	  
@@ -53,15 +53,12 @@ public class CSVUtil {
 			    	  
 			    	  users.add(user);
 			      }
-		      
 			      return users;
 			  }
-			  
 			  catch (IOException e) {
 				  throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
 			  }
 		  } 
-		  
 		  catch (IOException e) {
 			  throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
 		  }
@@ -78,20 +75,49 @@ public class CSVUtil {
 			      Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 			      
 			      for (CSVRecord csvRecord : csvRecords) {
-			    	  UsedVacation oneUsedVacation=null;
-
-			    	  oneUsedVacation = new UsedVacation(
-				              
+			    	  
+			    	  UsedVacation oneUsedVacation = new UsedVacation(
 				              getLocalDate(csvRecord.get("Vacation start date")),
 				              getLocalDate(csvRecord.get("Vacation end date")),
 				              userRepository.findByUserEmail(csvRecord.get("Employee")).get());
 
 			    	  usedVacation.add(oneUsedVacation);
 			      }
-		      
 			      return usedVacation;
 			  }
+			  catch (IOException e) {
+				  throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
+			  }
+		  } 
+		  catch (IOException e) {
+			  throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
+		  }
+	}
+	
+	public List<Vacation> csvToTotalVacationDays(InputStream is, UserRepository userRepository) {
+		  
+		  try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))){
+			  String firstLine = fileReader.readLine();
+			  String parts[] = firstLine.split(",");
+	
+			  try (CSVParser csvParser = new CSVParser(fileReader,
+		            CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())){
+				  
+		  	      List<Vacation> totalVacationDays = new ArrayList<Vacation>();
+			      Iterable<CSVRecord> csvRecords = csvParser.getRecords();
+			      
+			      for (CSVRecord csvRecord : csvRecords) {
 			  
+			    	  Vacation vacationDays = new Vacation(
+				              
+			    			  Integer.parseInt(csvRecord.get("Total vacation days")),
+			    			  Integer.parseInt(parts[1]),
+			    			  userRepository.findByUserEmail(csvRecord.get("Employee")).get());
+	
+			    	  totalVacationDays.add(vacationDays);
+			      }
+			      return totalVacationDays;
+			  }
 			  catch (IOException e) {
 				  throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
 			  }

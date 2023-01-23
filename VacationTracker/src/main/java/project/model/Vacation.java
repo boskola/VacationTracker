@@ -27,6 +27,13 @@ public class Vacation {
 	
 	public Vacation() {}
 
+	public Vacation(int totalVacationDays, int vacationYear, UserEntity user) {
+		super();
+		this.totalVacationDays = totalVacationDays;
+		this.vacationYear = vacationYear;
+		this.user = user;
+	}
+
 	public Long getId() {
 		return id;
 	}

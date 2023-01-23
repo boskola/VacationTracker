@@ -35,8 +35,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/admin/importEmployees").hasAuthority("ADMIN")
-                .requestMatchers("/api/admin/importUsedVacation").hasAuthority("ADMIN")
+                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();
