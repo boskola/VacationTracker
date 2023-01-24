@@ -25,6 +25,8 @@ import project.repository.UserRepository;
 public class CSVUtil {
 	
 	public static String TYPE = "text/csv";
+	
+	private static final String DATE_FORMAT = "EEEE, MMMM d, yyyy";
 
 	public static boolean hasCSVFormat(MultipartFile file) {
 	
@@ -77,8 +79,8 @@ public class CSVUtil {
 			      for (CSVRecord csvRecord : csvRecords) {
 			    	  
 			    	  UsedVacation oneUsedVacation = new UsedVacation(
-				              getLocalDate(csvRecord.get("Vacation start date")),
-				              getLocalDate(csvRecord.get("Vacation end date")),
+				              getLocalDate(csvRecord.get("Vacation start date"), DATE_FORMAT),
+				              getLocalDate(csvRecord.get("Vacation end date"), DATE_FORMAT),
 				              userRepository.findByUserEmail(csvRecord.get("Employee")).get());
 
 			    	  usedVacation.add(oneUsedVacation);
@@ -128,8 +130,8 @@ public class CSVUtil {
 		  }
 	}
 	
-    private LocalDate getLocalDate(String stringDate) throws DateTimeParseException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
+    public static LocalDate getLocalDate(String stringDate, String format) throws DateTimeParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         LocalDate date = LocalDate.parse(stringDate, formatter);
         
         return date;
