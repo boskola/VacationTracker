@@ -45,10 +45,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/api/employee/**").authenticated()
+                .requestMatchers("/api/employee/adminSearchUsedVacationDays").hasAuthority("ADMIN")
                 .and()
                 .securityContext().securityContextRepository(new NullSecurityContextRepository())
-            
-           
                 .and()
                 .httpBasic();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
