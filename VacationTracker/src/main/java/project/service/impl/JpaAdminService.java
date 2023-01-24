@@ -13,7 +13,7 @@ import project.model.UserEntity;
 import project.model.Vacation;
 import project.repository.UsedVacationRepository;
 import project.repository.UserRepository;
-import project.repository.VacationDaysRepository;
+import project.repository.VacationRepository;
 import project.service.AdminService;
 import project.util.CSVUtil;
 
@@ -27,7 +27,7 @@ public class JpaAdminService implements AdminService{
 	private UsedVacationRepository usedVacationRepository;
 	
 	@Autowired
-	private VacationDaysRepository vacationDaysRepository;
+	private VacationRepository vacationRepository;
 	
 	public void saveEmployees(MultipartFile file, PasswordEncoder passwordEncoder) {
 		try {
@@ -56,7 +56,7 @@ public class JpaAdminService implements AdminService{
 			CSVUtil csvUtil = new CSVUtil();
 			
 			List<Vacation> totalVacationDays = csvUtil.csvToTotalVacationDays(file.getInputStream(), userRepository);
-			vacationDaysRepository.saveAll(totalVacationDays);
+			vacationRepository.saveAll(totalVacationDays);
 		} catch (IOException e) {
 			throw new RuntimeException("fail to store csv data: " + e.getMessage());
 		}

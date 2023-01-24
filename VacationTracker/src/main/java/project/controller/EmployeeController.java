@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -45,6 +44,60 @@ public class EmployeeController {
 	@Autowired
 	private UsedVacationToUsedVacationDTO toUVDTO;
 	
+	@GetMapping("/search")
+	public ResponseEntity<ResponseMessage> searchTotalUsedAvailableVDays(
+			@RequestParam(required=true) String daysOption,
+			@RequestParam(required=true) String year,
+            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo){
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userEmail = authentication.getName();
+		UserEntity user = userRepository.findByUserEmail(userEmail).get();
+		
+		Integer yearInt = Integer.parseInt(year);
+		
+		if(daysOption.equals("total")) {
+			Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+			
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
+	
+		}else if(daysOption.equals("used")) {
+			Integer usedDays = employeeService.search(yearInt, user.getId());
+			
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
+			
+		}else if(daysOption.equals("available")) {
+			Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+			Integer usedDays = employeeService.search(Integer.parseInt(year), user.getId());
+			Integer avalableDays = totalDays - usedDays;
+			
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(avalableDays.toString()));
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+	
+	@GetMapping("/searchUsedVacationDays")
+	public ResponseEntity<List<UsedVacationDTO>> searchUsedVacationDays(
+			@RequestParam(required=false) String dateFromParam,
+            @RequestParam(required=false) String dateToParam,
+            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo){
+		
+		Page<UsedVacation> page;
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userEmail = authentication.getName();
+		UserEntity user = userRepository.findByUserEmail(userEmail).get();
+
+		try {
+			page = employeeService.search(CSVUtil.getLocalDate(dateFromParam, DATE_FORMAT), CSVUtil.getLocalDate(dateToParam, DATE_FORMAT), user.getId(), pageNo);
+			
+			return new ResponseEntity<>(toUVDTO.convert(page.getContent()), HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@PostMapping("/addUsedVacationDays")
 	public ResponseEntity<ResponseMessage> create(@Valid @RequestBody UsedVacationDTO usedVacationDTO){
 		String message = "";
@@ -68,29 +121,34 @@ public class EmployeeController {
 		}
 	}
 	
-	@GetMapping("/searchUsedVacationDays")
-	public ResponseEntity<List<UsedVacationDTO>> searchUsedVacationDays(
-			@RequestParam(required=false) String dateFromParam,
-            @RequestParam(required=false) String dateToParam,
+	@GetMapping("/adminSearch")
+	public ResponseEntity<ResponseMessage> adminSearchTotalUsedAvailableVDays(
+			@RequestParam(required=true) String daysOption,
+			@RequestParam(required=true) String year,
+			@RequestParam(required = true) String userEmail,
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo){
 		
-		Page<UsedVacation> page;
+		UserEntity user = userRepository.findByUserEmail(userEmail).get();
+		Integer yearInt = Integer.parseInt(year);
 		
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String userEmail = authentication.getName();
-		
-		try {
-			UserEntity user = userRepository.findByUserEmail(userEmail).get();
+		if(daysOption.equals("total")) {
+			Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+			
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
 	
-			if(dateFromParam != null && dateToParam != null) {
-				page = employeeService.search(CSVUtil.getLocalDate(dateFromParam, DATE_FORMAT), CSVUtil.getLocalDate(dateToParam, DATE_FORMAT), user.getId(), pageNo);
-
-				return new ResponseEntity<>(toUVDTO.convert(page.getContent()), HttpStatus.OK);
-			}
-		}catch(Exception e) {
-			System.out.println(e);
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}else if(daysOption.equals("used")) {
+			Integer usedDays = employeeService.search(yearInt, user.getId());
+			
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
+			
+		}else if(daysOption.equals("available")) {
+			Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+			Integer usedDays = employeeService.search(yearInt, user.getId());
+			Integer avalableDays = totalDays - usedDays;
+			
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(avalableDays.toString()));
 		}
+
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
@@ -98,26 +156,20 @@ public class EmployeeController {
 	public ResponseEntity<List<UsedVacationDTO>> adminSearchUsedVacationDays(
 			@RequestParam(required=false) String dateFromParam,
             @RequestParam(required=false) String dateToParam,
-            @RequestParam(required=false) String userEmailParam,
+            @RequestParam(required=true) String userEmailParam,
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo){
 		
 		Page<UsedVacation> page;
+		UserEntity user = userRepository.findByUserEmail(userEmailParam).get();
 		
 		try {
-			UserEntity user = userRepository.findByUserEmail(userEmailParam).get();
-	
-			if(dateFromParam != null && dateToParam != null) {
-				
-				page = employeeService.search(CSVUtil.getLocalDate(dateFromParam, DATE_FORMAT), CSVUtil.getLocalDate(dateToParam, DATE_FORMAT), user.getId(), pageNo);
-				System.out.println(page);
-				return new ResponseEntity<>(toUVDTO.convert(page.getContent()), HttpStatus.OK);
-			}
-			
+			page = employeeService.search(CSVUtil.getLocalDate(dateFromParam, DATE_FORMAT), CSVUtil.getLocalDate(dateToParam, DATE_FORMAT), user.getId(), pageNo);
+
+			return new ResponseEntity<>(toUVDTO.convert(page.getContent()), HttpStatus.OK);
 			
 		}catch(Exception e) {
 			System.out.println(e);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 }

@@ -10,4 +10,6 @@ public interface EmployeeService {
 	
 	UsedVacation save(UsedVacation usedVacation);
 	Page<UsedVacation> search(LocalDate vacationStartDate, LocalDate vacationEndDate, Long userId, Integer pageNo);
+	Integer searchVacation(Integer vacationYear, Long userId);
+	Integer search(Integer year, Long userId);
 }

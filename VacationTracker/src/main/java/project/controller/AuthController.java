@@ -43,7 +43,7 @@ public class AuthController {
                 loginDto.getUserPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
-
+    
         return new ResponseEntity<>(new AuthResponseDTO(token), HttpStatus.OK);
     }
     

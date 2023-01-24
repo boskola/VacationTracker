@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import project.model.UsedVacation;
 import project.repository.UsedVacationRepository;
+import project.repository.VacationRepository;
 import project.service.EmployeeService;
 
 @Service
@@ -16,6 +17,9 @@ public class JpaEmployeeService implements EmployeeService {
 	
 	@Autowired
 	private UsedVacationRepository usedVacationRepository;
+	
+	@Autowired
+	private VacationRepository vacationRepository;
 
 	@Override
 	public UsedVacation save(UsedVacation usedVacation) {
@@ -25,9 +29,33 @@ public class JpaEmployeeService implements EmployeeService {
 
 	@Override
 	public Page<UsedVacation> search(LocalDate vacationStartDate, LocalDate vacationEndDate, Long userId, Integer pageNo) {
-		// TODO Auto-generated method stub
+		
+		if(vacationStartDate==null && vacationEndDate==null) {
+			return usedVacationRepository.findByUserId(userId, PageRequest.of(pageNo,10));
+		}
+		
+		if(vacationStartDate==null) {
+			return usedVacationRepository.findByVacationEndDateLessThanEqualAndUserId(vacationEndDate, userId, PageRequest.of(pageNo,10));
+		}
+		
+		if(vacationEndDate==null) {
+			return usedVacationRepository.findByVacationStartDateGreaterThanEqualAndUserId(vacationStartDate, userId, PageRequest.of(pageNo,10));
+		}
+		
 		return usedVacationRepository.findByVacationStartDateGreaterThanEqualAndVacationEndDateLessThanEqualAndUserId
 				(vacationStartDate, vacationEndDate, userId, PageRequest.of(pageNo,10));
+	}
+	
+	@Override
+	public Integer search(Integer year, Long userId) {
+		// TODO Auto-generated method stub
+		return usedVacationRepository.search(year, userId);
+	}
+
+	@Override
+	public Integer searchVacation(Integer vacationYear, Long userId) {
+		// TODO Auto-generated method stub
+		return vacationRepository.findByVacationYearAndUserId(vacationYear, userId);
 	}
 
 }

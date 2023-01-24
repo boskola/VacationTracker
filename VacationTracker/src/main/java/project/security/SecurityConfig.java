@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.NullSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -43,11 +44,14 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/employee/adminSearch").hasAuthority("ADMIN")
+                .requestMatchers("/api/employee/adminSearchUsedVacationDays").hasAuthority("ADMIN")
                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/api/employee/**").authenticated()
-                .requestMatchers("/api/employee/adminSearchUsedVacationDays").hasAuthority("ADMIN")
-                .and()
-                .securityContext().securityContextRepository(new NullSecurityContextRepository())
+//                .and()
+//                .logout().logoutUrl("/logout").logoutSuccessUrl("/login").deleteCookies("auth_code", "JSESSIONID").invalidateHttpSession(true)
+//                .and()
+//                .securityContext().securityContextRepository(new RequestAttributeSecurityContextRepository())
                 .and()
                 .httpBasic();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

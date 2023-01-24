@@ -131,7 +131,10 @@ public class CSVUtil {
 	}
 	
     public static LocalDate getLocalDate(String stringDate, String format) throws DateTimeParseException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+    	if(stringDate==null) {
+    		return null;
+    	}
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         LocalDate date = LocalDate.parse(stringDate, formatter);
         
         return date;
