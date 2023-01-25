@@ -1,5 +1,6 @@
 package project.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,16 +9,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import project.dto.InvalidDataDTO;
 import project.message.ResponseMessage;
+import project.model.UserEntity;
 import project.service.AdminService;
+import project.service.EmployeeService;
 import project.util.CSVUtil;
 
-//@CrossOrigin("http://localhost:5432")
 @Controller
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -27,6 +31,9 @@ public class AdminController {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private EmployeeService employeeService;
 	
 	@PostMapping("/importEmployees")
 	public ResponseEntity<ResponseMessage> importEmployees(@RequestParam("file") MultipartFile file) {
@@ -116,6 +123,49 @@ public class AdminController {
 			}
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+	}
+	
+	@GetMapping("/checkData")
+	public ResponseEntity<List<InvalidDataDTO>> checkData(@RequestParam String yearFrom,
+														  @RequestParam String yearTo){
+		
+		List<InvalidDataDTO> searchResult = new ArrayList<>();
+		
+		try {
+			
+			List<UserEntity> users = fileService.getAllUsers();
+			
+			int yearIntFrom = Integer.parseInt(yearFrom); 
+			int yearIntTo = Integer.parseInt(yearTo);
+			
+			if(yearIntFrom > yearIntTo) {
+				return new ResponseEntity<>(searchResult, HttpStatus.OK); 
+			}
+			
+			Integer totalDays, usedDays, availableDays;
+			
+			if(yearIntTo > LocalDate.now().getYear()) {
+				yearIntTo = LocalDate.now().getYear();
+			}
+			
+			for(UserEntity user: users) {
+				if (user.getId()==1)
+					continue;
+				for(int i=yearIntFrom; i<=yearIntTo; i++) {
+					totalDays = employeeService.searchVacation(i, user.getId());
+					usedDays = employeeService.search(i, user.getId());
+					availableDays = totalDays - usedDays;
+					InvalidDataDTO record = new InvalidDataDTO(user.getUserEmail(), availableDays, i);
+					if (availableDays<0)
+						searchResult.add(record);
+				}
+			}
+
+			return new ResponseEntity<>(searchResult, HttpStatus.OK);
+			
+		}catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
 //	@GetMapping("/users")

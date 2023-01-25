@@ -49,13 +49,26 @@ public class JpaEmployeeService implements EmployeeService {
 	@Override
 	public Integer search(Integer year, Long userId) {
 		// TODO Auto-generated method stub
-		return usedVacationRepository.search(year, userId);
+		Integer result = usedVacationRepository.search(year, userId);
+		
+		if (result==null) {
+			return 0;
+		}
+		else {
+			return result;
+		}
 	}
 
 	@Override
 	public Integer searchVacation(Integer vacationYear, Long userId) {
 		// TODO Auto-generated method stub
-		return vacationRepository.findByVacationYearAndUserId(vacationYear, userId);
+		Integer result = vacationRepository.findByVacationYearAndUserId(vacationYear, userId);
+		
+		if (result==null) {
+			return 0;
+		}
+		else {
+			return result;
+		}
 	}
-
 }
