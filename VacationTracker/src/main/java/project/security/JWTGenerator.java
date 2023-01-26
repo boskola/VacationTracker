@@ -13,7 +13,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JWTGenerator {
 	
-    public static final long JWT_EXPIRATION = 80000;
+    public static final long JWT_EXPIRATION = 800000;
     public static final String JWT_SECRET = "secret";
 
     public String generateToken(Authentication authentication) {

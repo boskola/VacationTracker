@@ -62,7 +62,7 @@ public class JpaEmployeeService implements EmployeeService {
 	@Override
 	public Integer searchVacation(Integer vacationYear, Long userId) {
 		// TODO Auto-generated method stub
-		Integer result = vacationRepository.findByVacationYearAndUserId(vacationYear, userId);
+		Integer result = vacationRepository.findDaysForVacationYearUserId(vacationYear, userId);
 		
 		if (result==null) {
 			return 0;

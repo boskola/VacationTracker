@@ -49,41 +49,44 @@ public class EmployeeController {
 	@GetMapping("/search")
 	public ResponseEntity<ResponseMessage> searchTotalUsedAvailableVDays(
 			@RequestParam(required=true) String daysOption,
-			@RequestParam(required=true) String year,
-            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo){
+			@RequestParam(required=true) String year){
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String userEmail = authentication.getName();
-		UserEntity user = userRepository.findByUserEmail(userEmail).get();
 		
-		Integer yearInt = Integer.parseInt(year);
-		
-		if(daysOption.equals("total")) {
-			Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+		try {
+			UserEntity user = userRepository.findByUserEmail(userEmail).get();
 			
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
-	
-		}else if(daysOption.equals("used")) {
-			Integer usedDays = employeeService.search(yearInt, user.getId());
+			Integer yearInt = Integer.parseInt(year);
 			
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
-			
-		}else if(daysOption.equals("available")) {
-			Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
-			Integer usedDays = employeeService.search(Integer.parseInt(year), user.getId());
-			Integer availableDays = totalDays - usedDays;
-			Integer availableDaysPositive = -availableDays;
-			
-			if(availableDays<0) {
+			if(daysOption.equals("total")) {
+				Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
 				
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage
-					("The user has used more vacation days than intended: " + availableDaysPositive.toString() +
-					"! User has no more available vacation days!"));
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
+		
+			}else if(daysOption.equals("used")) {
+				Integer usedDays = employeeService.search(yearInt, user.getId());
+				
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
+				
+			}else if(daysOption.equals("available")) {
+				Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+				Integer usedDays = employeeService.search(Integer.parseInt(year), user.getId());
+				Integer availableDays = totalDays - usedDays;
+				Integer availableDaysPositive = -availableDays;
+				
+				if(availableDays<0) {
+					
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage
+						("The user has used more vacation days than intended: " + availableDaysPositive.toString() +
+						"! User has no more available vacation days!"));
+				}
+				
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(availableDays.toString()));
 			}
-			
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(availableDays.toString()));
+		}catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
@@ -91,38 +94,41 @@ public class EmployeeController {
 	public ResponseEntity<ResponseMessage> adminSearchTotalUsedAvailableVDays(
 			@RequestParam(required=true) String daysOption,
 			@RequestParam(required=true) String year,
-			@RequestParam(required = true) String userEmail,
-            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo){
+			@RequestParam(required = true) String userEmail){
 		
-		UserEntity user = userRepository.findByUserEmail(userEmail).get();
-		Integer yearInt = Integer.parseInt(year);
+		try {
+			UserEntity user = userRepository.findByUserEmail(userEmail).get();
+			Integer yearInt = Integer.parseInt(year);
+			
+			if(daysOption.equals("total")) {
+				Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+				
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
 		
-		if(daysOption.equals("total")) {
-			Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
-			
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
-	
-		}else if(daysOption.equals("used")) {
-			Integer usedDays = employeeService.search(yearInt, user.getId());
-			
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
-			
-		}else if(daysOption.equals("available")) {
-			Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
-			Integer usedDays = employeeService.search(yearInt, user.getId());
-			Integer availableDays = totalDays - usedDays;
-			Integer availableDaysPositive = -availableDays;
-			
-			if(availableDays<=0) {
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage
-					("The user has used more vacation days than intended: " + availableDaysPositive.toString() +
-					"! User has no more available vacation days!"));
+			}else if(daysOption.equals("used")) {
+				Integer usedDays = employeeService.search(yearInt, user.getId());
+				
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
+				
+			}else if(daysOption.equals("available")) {
+				Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+				Integer usedDays = employeeService.search(yearInt, user.getId());
+				Integer availableDays = totalDays - usedDays;
+				Integer availableDaysPositive = -availableDays;
+				
+				if(availableDays<=0) {
+					return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage
+						("The user has used more vacation days than intended: " + availableDaysPositive.toString() +
+						"! User has no more available vacation days!"));
+				}
+				
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(availableDays.toString()));
 			}
-			
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(availableDays.toString()));
+	
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
 	@GetMapping("/searchUsedVacationDays")
@@ -135,9 +141,9 @@ public class EmployeeController {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String userEmail = authentication.getName();
-		UserEntity user = userRepository.findByUserEmail(userEmail).get();
-
+		
 		try {
+			UserEntity user = userRepository.findByUserEmail(userEmail).get();
 			page = employeeService.search(CSVUtil.getLocalDate(dateFromParam, DATE_FORMAT), CSVUtil.getLocalDate(dateToParam, DATE_FORMAT), user.getId(), pageNo);
 			
 			return new ResponseEntity<>(toUVDTO.convert(page.getContent()), HttpStatus.OK);
@@ -154,15 +160,14 @@ public class EmployeeController {
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo){
 		
 		Page<UsedVacation> page;
-		UserEntity user = userRepository.findByUserEmail(userEmailParam).get();
 		
 		try {
+			UserEntity user = userRepository.findByUserEmail(userEmailParam).get();
 			page = employeeService.search(CSVUtil.getLocalDate(dateFromParam, DATE_FORMAT), CSVUtil.getLocalDate(dateToParam, DATE_FORMAT), user.getId(), pageNo);
 
 			return new ResponseEntity<>(toUVDTO.convert(page.getContent()), HttpStatus.OK);
 			
 		}catch(Exception e) {
-			System.out.println(e);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -183,7 +188,6 @@ public class EmployeeController {
 		}
 		
 		try {
-			
 			UserEntity user = userRepository.findByUserEmail(userEmail).get();
 			
 			if(startDate.getYear() == endDate.getYear()){
@@ -192,7 +196,7 @@ public class EmployeeController {
 				Integer totalDays = employeeService.searchVacation(year, user.getId());
 				Integer usedDays = employeeService.search(year, user.getId());
 				Integer availableDays = totalDays - usedDays;
-				
+
 				if(availableDays < ChronoUnit.DAYS.between(startDate, endDate)+1) {
 					message = "The user has no more available vacation days for this year!";
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
