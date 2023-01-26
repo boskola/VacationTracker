@@ -2,6 +2,7 @@ package project.controller;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,18 +61,18 @@ public class EmployeeController {
 			Integer yearInt = Integer.parseInt(year);
 			
 			if(daysOption.equals("total")) {
-				Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+				Integer totalDays = employeeService.searchTotalVacationDays(yearInt, user.getId());
 				
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
 		
 			}else if(daysOption.equals("used")) {
-				Integer usedDays = employeeService.search(yearInt, user.getId());
+				Integer usedDays = employeeService.searchUsedVacationDays(yearInt, user.getId());
 				
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
 				
 			}else if(daysOption.equals("available")) {
-				Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
-				Integer usedDays = employeeService.search(Integer.parseInt(year), user.getId());
+				Integer totalDays = employeeService.searchTotalVacationDays(yearInt, user.getId());
+				Integer usedDays = employeeService.searchUsedVacationDays(Integer.parseInt(year), user.getId());
 				Integer availableDays = totalDays - usedDays;
 				Integer availableDaysPositive = -availableDays;
 				
@@ -101,18 +102,18 @@ public class EmployeeController {
 			Integer yearInt = Integer.parseInt(year);
 			
 			if(daysOption.equals("total")) {
-				Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
+				Integer totalDays = employeeService.searchTotalVacationDays(yearInt, user.getId());
 				
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
 		
 			}else if(daysOption.equals("used")) {
-				Integer usedDays = employeeService.search(yearInt, user.getId());
+				Integer usedDays = employeeService.searchUsedVacationDays(yearInt, user.getId());
 				
 				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
 				
 			}else if(daysOption.equals("available")) {
-				Integer totalDays = employeeService.searchVacation(yearInt, user.getId());
-				Integer usedDays = employeeService.search(yearInt, user.getId());
+				Integer totalDays = employeeService.searchTotalVacationDays(yearInt, user.getId());
+				Integer usedDays = employeeService.searchUsedVacationDays(yearInt, user.getId());
 				Integer availableDays = totalDays - usedDays;
 				Integer availableDaysPositive = -availableDays;
 				
@@ -190,11 +191,16 @@ public class EmployeeController {
 		try {
 			UserEntity user = userRepository.findByUserEmail(userEmail).get();
 			
+			if(!checkInputAdd(startDate, endDate, user)) {
+				message="Wrong dates!";
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
+			}
+			
 			if(startDate.getYear() == endDate.getYear()){
 				Integer year = startDate.getYear();
 				
-				Integer totalDays = employeeService.searchVacation(year, user.getId());
-				Integer usedDays = employeeService.search(year, user.getId());
+				Integer totalDays = employeeService.searchTotalVacationDays(year, user.getId());
+				Integer usedDays = employeeService.searchUsedVacationDays(year, user.getId());
 				Integer availableDays = totalDays - usedDays;
 
 				if(availableDays < ChronoUnit.DAYS.between(startDate, endDate)+1) {
@@ -204,8 +210,8 @@ public class EmployeeController {
 			}else if(startDate.getYear() < endDate.getYear()) {
 				Integer year1=(startDate.getYear());
 				
-				Integer totalDays1 = employeeService.searchVacation(year1, user.getId());
-				Integer usedDays1 = employeeService.search(year1, user.getId());
+				Integer totalDays1 = employeeService.searchTotalVacationDays(year1, user.getId());
+				Integer usedDays1 = employeeService.searchUsedVacationDays(year1, user.getId());
 				Integer availableDays1 = totalDays1 - usedDays1;
 				LocalDate lastDay = LocalDate.of(year1, 12, 31);
 				
@@ -216,8 +222,8 @@ public class EmployeeController {
 				
 				Integer year2=(endDate.getYear());
 				
-				Integer totalDays2 = employeeService.searchVacation(year2, user.getId());
-				Integer usedDays2 = employeeService.search(year2, user.getId());
+				Integer totalDays2 = employeeService.searchTotalVacationDays(year2, user.getId());
+				Integer usedDays2 = employeeService.searchUsedVacationDays(year2, user.getId());
 				Integer availableDays2 = totalDays2 - usedDays2;
 				LocalDate firstDay = LocalDate.of(year2, 01, 01);
 				
@@ -238,6 +244,30 @@ public class EmployeeController {
 		}catch(Exception e) {
 			message = "The user is not found!";
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
+		}
+	}
+	
+	public boolean checkInputAdd(LocalDate fromDate, LocalDate endDate, UserEntity user) {
+		try {
+			ArrayList<UsedVacation> usedVacationDays = new ArrayList<>();
+			usedVacationDays.addAll(employeeService.getUsedVacationDays(user.getId()));
+			
+			for(UsedVacation usedVacation: usedVacationDays) {
+				
+				boolean firstCondition = 
+					(fromDate.isBefore(usedVacation.getVacationEndDate()) || fromDate.isEqual(usedVacation.getVacationEndDate()));
+				
+				boolean secondCondition = 
+						(endDate.isAfter(usedVacation.getVacationStartDate()) || endDate.isEqual(usedVacation.getVacationStartDate()));
+	
+				if(firstCondition && secondCondition) {
+					return false;
+				}
+			}
+			return true;
+			
+		}catch (Exception e) {
+			return false;
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package project.service.impl;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,7 +48,7 @@ public class JpaEmployeeService implements EmployeeService {
 	}
 	
 	@Override
-	public Integer search(Integer year, Long userId) {
+	public Integer searchUsedVacationDays(Integer year, Long userId) {
 		// TODO Auto-generated method stub
 		Integer result = usedVacationRepository.search(year, userId);
 		
@@ -60,7 +61,7 @@ public class JpaEmployeeService implements EmployeeService {
 	}
 
 	@Override
-	public Integer searchVacation(Integer vacationYear, Long userId) {
+	public Integer searchTotalVacationDays(Integer vacationYear, Long userId) {
 		// TODO Auto-generated method stub
 		Integer result = vacationRepository.findDaysForVacationYearUserId(vacationYear, userId);
 		
@@ -70,5 +71,11 @@ public class JpaEmployeeService implements EmployeeService {
 		else {
 			return result;
 		}
+	}
+
+	@Override
+	public List<UsedVacation> getUsedVacationDays(Long userId) {
+		// TODO Auto-generated method stub
+		return usedVacationRepository.findByUserId(userId);
 	}
 }

@@ -153,8 +153,8 @@ public class AdminController {
 				if (user.getId()==1)
 					continue;
 				for(int i=yearIntFrom; i<=yearIntTo; i++) {
-					totalDays = employeeService.searchVacation(i, user.getId());
-					usedDays = employeeService.search(i, user.getId());
+					totalDays = employeeService.searchTotalVacationDays(i, user.getId());
+					usedDays = employeeService.searchUsedVacationDays(i, user.getId());
 					availableDays = totalDays - usedDays;
 					InvalidDataDTO record = new InvalidDataDTO(user.getUserEmail(), availableDays, i);
 					if (availableDays<0)

@@ -118,8 +118,8 @@ public class ControllerIntegrationTests {
 	@WithMockUser("user1@rbt.rs")
 	public void addUsedVacationDays() throws Exception {
 		UsedVacationDTO usedVacation = new UsedVacationDTO();
-		usedVacation.setVacationStartDate("2019-07-02"); // start date is after begin
-		usedVacation.setVacationEndDate("2019-02-02");
+		usedVacation.setVacationStartDate("2019-10-23"); // time period overlap
+		usedVacation.setVacationEndDate("2019-10-25");
 
 		String url = "/api/employee/addUsedVacationDays";
 		ObjectMapper mapper = new ObjectMapper();
