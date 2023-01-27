@@ -124,3 +124,8 @@
 		auth - basic auth (username: bosko@rbt.bb, password: bosko)
 		params - 1. key: yearFrom, value: "2019" 2. key: yearTo, value: "2021"
 	
+## Instructions for starting the tests
+
+	mvn clean test
+
+**In package "positive" tested with valid data, in package "negative" tested with invalid data**
