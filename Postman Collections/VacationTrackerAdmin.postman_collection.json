@@ -1,0 +1,361 @@
+{
+	"info": {
+		"_postman_id": "0774f462-77d8-4db0-a203-bc40bcd3353d",
+		"name": "VacationTrackerAdmin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23712204"
+	},
+	"item": [
+		{
+			"name": "LoginAdmin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userEmail\": \"bosko@rbt.bb\",\r\n    \"userPassword\": \"bosko\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ImportEmployees",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "bosko@rbt.bb",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "bosko",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"contentType": "text/csv",
+							"type": "file",
+							"src": "/C:/Users/BOSKO_PC/Desktop/Tehnicki zadatak/Samples/Samples/employee_profiles.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/importEmployees",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"importEmployees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ImportUsedVacation",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "bosko",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "bosko@rbt.bb",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/BOSKO_PC/Desktop/Tehnicki zadatak/Samples/Samples/used_vacation_dates.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/importUsedVacation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"importUsedVacation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ImportTotalVacationDays",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "bosko",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "bosko@rbt.bb",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file1",
+							"type": "file",
+							"src": "/C:/Users/BOSKO_PC/Desktop/Tehnicki zadatak/Samples/Samples/vacations_2019.csv"
+						},
+						{
+							"key": "file2",
+							"type": "file",
+							"src": "/C:/Users/BOSKO_PC/Desktop/Tehnicki zadatak/Samples/Samples/vacations_2020.csv"
+						},
+						{
+							"key": "file3",
+							"type": "file",
+							"src": "/C:/Users/BOSKO_PC/Desktop/Tehnicki zadatak/Samples/Samples/vacations_2021.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/admin/importTotalVacationDays",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"importTotalVacationDays"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SearchAdmin",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "bosko",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "bosko@rbt.bb",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/adminSearch?daysOption=total&year=2019&userEmail=user1@rbt.rs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"adminSearch"
+					],
+					"query": [
+						{
+							"key": "daysOption",
+							"value": "total"
+						},
+						{
+							"key": "year",
+							"value": "2019"
+						},
+						{
+							"key": "userEmail",
+							"value": "user1@rbt.rs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SearchUsedDaysAdmin",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "bosko",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "bosko@rbt.bb",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/adminSearchUsedVacationDays?dateFromParam=2019-01-01&dateToParam=2019-10-10&userEmailParam=user1@rbt.rs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"adminSearchUsedVacationDays"
+					],
+					"query": [
+						{
+							"key": "dateFromParam",
+							"value": "2019-01-01"
+						},
+						{
+							"key": "dateToParam",
+							"value": "2019-10-10"
+						},
+						{
+							"key": "userEmailParam",
+							"value": "user1@rbt.rs"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CheckData",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/admin/checkData?yearFrom=2019&yearTo=2020",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"admin",
+						"checkData"
+					],
+					"query": [
+						{
+							"key": "yearFrom",
+							"value": "2019"
+						},
+						{
+							"key": "yearTo",
+							"value": "2020"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "bosko",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "bosko@rbt.bb",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

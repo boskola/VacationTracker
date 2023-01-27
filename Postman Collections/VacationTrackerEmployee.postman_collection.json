@@ -1,0 +1,180 @@
+{
+	"info": {
+		"_postman_id": "f77491a0-e14f-42ec-a98a-1886599ab9da",
+		"name": "VacationTrackerEmployee",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23712204"
+	},
+	"item": [
+		{
+			"name": "LoginEmployee",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userEmail\": \"user1@rbt.rs\",\r\n    \"userPassword\": \"Abc!@#$\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SearchEmployee",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user1@rbt.rs",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "Abc!@#$",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/employee/search?daysOption=total&year=2019",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"employee",
+						"search"
+					],
+					"query": [
+						{
+							"key": "daysOption",
+							"value": "total"
+						},
+						{
+							"key": "year",
+							"value": "2019"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddUsedDaysEmployee",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Abc!@#$",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "user1@rbt.rs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"vacationStartDate\":\"2019-05-05\",\r\n    \"vacationEndDate\": \"2019-05-05\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/employee/addUsedVacationDays",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"employee",
+						"addUsedVacationDays"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SearchUsedDaysEmployee",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Abc!@#$",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "user1@rbt.rs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/employee/searchUsedVacationDays?dateFromParam=2019-01-01&dateToParam=2019-10-10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"employee",
+						"searchUsedVacationDays"
+					],
+					"query": [
+						{
+							"key": "dateFromParam",
+							"value": "2019-01-01"
+						},
+						{
+							"key": "dateToParam",
+							"value": "2019-10-10"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
