@@ -66,22 +66,23 @@ public class ControllerIntegrationTests {
 		isVacation3 = controller.getClass().getClassLoader().getResourceAsStream("vacations_2021.csv");
 
 	}
-
-	@Test
-	@Order(1)
-	@WithMockUser(username = "bosko@rbt.bb")
-	public void importEmployees() throws Exception {
-		String fileName = "employee_profiles.csv";
-		MockMultipartFile sampleFile = new MockMultipartFile("file", fileName, "text/csv", isEmployees
-
-		);
-
-		MockMultipartHttpServletRequestBuilder multipartRequest = MockMvcRequestBuilders
-				.multipart("/api/admin/importEmployees");
-
-		mockMvc.perform(multipartRequest.file(sampleFile)).andExpect(status().isOk());
-
-	}
+	
+// It exists already in other test Class - in negative package
+//	@Test
+//	@Order(1)
+//	@WithMockUser(username = "bosko@rbt.bb")
+//	public void importEmployees() throws Exception {
+//		String fileName = "employee_profiles.csv";
+//		MockMultipartFile sampleFile = new MockMultipartFile("file", fileName, "text/csv", isEmployees
+//
+//		);
+//
+//		MockMultipartHttpServletRequestBuilder multipartRequest = MockMvcRequestBuilders
+//				.multipart("/api/admin/importEmployees");
+//
+//		mockMvc.perform(multipartRequest.file(sampleFile)).andExpect(status().isOk());
+//
+//	}
 
 	@Test
 	@Order(2)
@@ -119,7 +120,7 @@ public class ControllerIntegrationTests {
 
 	@Test
 	@Order(4)
-	@WithMockUser("user1@rbt.rs")
+	@WithMockUser("user8@rbt.rs")
 	public void addUsedVacationDays() throws Exception {
 		UsedVacationDTO usedVacation = new UsedVacationDTO();
 		usedVacation.setVacationStartDate("2019-02-02");
