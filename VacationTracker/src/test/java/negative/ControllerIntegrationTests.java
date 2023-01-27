@@ -45,7 +45,7 @@ public class ControllerIntegrationTests {
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
-	private InputStream isEmployees, isUsedVacation, isVacation1, isVacation2, isVacation3;
+	private InputStream isEmployees, isUsedVacation, isVacation1, isVacation2, isVacation3, isEmployees2;
 	
 	@Autowired
 	private WebApplicationContext applicationContext;
@@ -65,11 +65,14 @@ public class ControllerIntegrationTests {
 		isVacation1 = controller.getClass().getClassLoader().getResourceAsStream("vacations_2019.csv");
 		isVacation2 = controller.getClass().getClassLoader().getResourceAsStream("vacations_2020.csv");
 		isVacation3 = controller.getClass().getClassLoader().getResourceAsStream("vacations_2021.csv");
+		// for test case where employee tries to upload a file
+		isEmployees2 = controller.getClass().getClassLoader().getResourceAsStream("employee_profiles.csv");
 
 	}
 
 	@Test
 	@Order(1)
+	@WithMockUser(username = "bosko@rbt.bb")
 	public void importEmployees() throws Exception {
 		String fileName = "employee_profiles.csv";
 		MockMultipartFile sampleFile = new MockMultipartFile("file", fileName, "text/csv", isEmployees
@@ -85,6 +88,7 @@ public class ControllerIntegrationTests {
 
 	@Test
 	@Order(2)
+	@WithMockUser(username = "bosko@rbt.bb")
 	public void importUsedVacation() throws Exception {
 		String fileName = "used_vacation_dates.csv";
 		MockMultipartFile sampleFile = new MockMultipartFile("file", fileName, "text/csv", isUsedVacation
@@ -99,6 +103,7 @@ public class ControllerIntegrationTests {
 
 	@Test
 	@Order(3)
+	@WithMockUser(username = "bosko@rbt.bb")
 	public void importVacation() throws Exception {
 		String fileName1 = "vacations_2019.csv", fileName2 = "vacations_2020.csv", fileName3 = "vacations_2021.csv";
 		MockMultipartFile sampleFile1 = new MockMultipartFile("file", fileName1, "text/csv", isVacation1);
@@ -115,7 +120,7 @@ public class ControllerIntegrationTests {
 
 	@Test
 	@Order(4)
-	@WithMockUser("user1@rbt.rs")
+	@WithMockUser(username = "user1@rbt.rs")
 	public void addUsedVacationDays() throws Exception {
 		UsedVacationDTO usedVacation = new UsedVacationDTO();
 		usedVacation.setVacationStartDate("2019-10-23"); // time period overlap
@@ -133,9 +138,10 @@ public class ControllerIntegrationTests {
 
 	@Test
 	@Order(5)
+	@WithMockUser(username = "bosko@rbt.bb")
 	public void searchTotalAdmin() throws Exception {
 		String year = "2019";
-		String url = "/api/employee/adminSearch";
+		String url = "/api/admin/adminSearch";
 		MvcResult result = mockMvc
 				.perform(get(url).param("daysOption", "total").param("year", year).param("userEmail", "user0@rbt.rs")) // user
 																														// doesn't
@@ -147,20 +153,22 @@ public class ControllerIntegrationTests {
 
 	@Test
 	@Order(6)
+	@WithMockUser(username = "bosko@rbt.bb")
 	public void searchUsedAdmin() throws Exception {
 		String year = "2019";
-		String url = "/api/employee/adminSearch";
+		String url = "/api/admin/adminSearch";
 		MvcResult result = mockMvc.perform(get(url).param("daysOption", "use") // bad input
-				.param("year", year).param("userEmail", "user2@rbt.rs")).andExpect(status().isBadRequest()).andReturn();
+				.param("year", year).param("userEmail", "user1@rbt.rs")).andExpect(status().isBadRequest()).andReturn();
 		String content = result.getResponse().getContentAsString();
 		System.out.println(content);
 	}
 
 	@Test
 	@Order(7)
+	@WithMockUser(username = "bosko@rbt.bb")
 	public void searchAvailableAdmin() throws Exception {
 		String year = "2030"; // bad year, without data
-		String url = "/api/employee/adminSearch";
+		String url = "/api/admin/adminSearch";
 		mockMvc.perform(
 				get(url).param("daysOption", "available").param("year", year).param("userEmail", "user2@rbt.rs"))
 				.andExpect(status().isOk())
@@ -171,12 +179,13 @@ public class ControllerIntegrationTests {
 
 	@Test
 	@Order(8)
+	@WithMockUser(username = "bosko@rbt.bb")
 	public void searchUsedVacationDaysAdmin() throws Exception {
 		String dateFromParam = "2010-11-11";
 		String dateToParam = "2023-11-aaa"; // not date
-		String url = "/api/employee/adminSearchUsedVacationDays";
+		String url = "/api/admin/adminSearchUsedVacationDays";
 		MvcResult result = mockMvc.perform(get(url).param("dateFromParam", dateFromParam)
-				.param("dateToParam", dateToParam).param("userEmailParam", "user2@rbt.rs"))
+				.param("dateToParam", dateToParam).param("userEmailParam", "user3@rbt.rs"))
 				.andExpect(status().isBadRequest()).andReturn();
 		String content = result.getResponse().getContentAsString();
 		System.out.println(content);
@@ -193,4 +202,38 @@ public class ControllerIntegrationTests {
 		String content = result.getResponse().getContentAsString();
 		System.out.println(content);
 	}
+	
+	@Test
+	@Order(10)
+	@WithMockUser(username = "user1@rbt.rs")
+	public void importEmployeesEmployee() throws Exception {
+		String fileName = "employee_profiles.csv";
+		MockMultipartFile sampleFile = new MockMultipartFile("file", fileName, "text/csv", isEmployees2
+
+		);
+
+		MockMultipartHttpServletRequestBuilder multipartRequest = MockMvcRequestBuilders
+				.multipart("/api/admin/importEmployees");
+
+		mockMvc.perform(multipartRequest.file(sampleFile)).andExpect(status().is4xxClientError());
+
+	}
+	
+//	@Test
+//	@Order(11)
+//	@WithMockUser("user1@rbt.rs")
+//	public void addUsedVacationDays2() throws Exception {
+//		UsedVacationDTO usedVacation = new UsedVacationDTO();
+//		usedVacation.setVacationStartDate("2019-10-18"); // 
+//		usedVacation.setVacationEndDate("2019-10-22");
+//
+//		String url = "/api/employee/addUsedVacationDays";
+//		ObjectMapper mapper = new ObjectMapper();
+//		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+//		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+//		String requestJson = ow.writeValueAsString(usedVacation);
+//
+//		mockMvc.perform(post(url).contentType(APPLICATION_JSON_UTF8).content(requestJson))
+//				.andExpect(status().isBadRequest());
+//	}
 }

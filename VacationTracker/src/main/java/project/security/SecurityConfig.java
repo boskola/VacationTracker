@@ -38,18 +38,12 @@ public class SecurityConfig {
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-               // .and().authorizeHttpRequests().anyRequest().permitAll();
+                //.and().authorizeHttpRequests().anyRequest().permitAll();
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/employee/adminSearch").hasAuthority("ADMIN")
-                .requestMatchers("/api/employee/adminSearchUsedVacationDays").hasAuthority("ADMIN")
                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/api/employee/**").authenticated()
-//                .and()
-//                .logout().logoutUrl("/logout").logoutSuccessUrl("/login").deleteCookies("auth_code", "JSESSIONID").invalidateHttpSession(true)
-//                .and()
-//                .securityContext().securityContextRepository(new RequestAttributeSecurityContextRepository())
                 .and()
                 .httpBasic();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

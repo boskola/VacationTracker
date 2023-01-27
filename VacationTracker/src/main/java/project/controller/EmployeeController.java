@@ -91,46 +91,7 @@ public class EmployeeController {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
-	@GetMapping("/adminSearch")
-	public ResponseEntity<ResponseMessage> adminSearchTotalUsedAvailableVDays(
-			@RequestParam(required=true) String daysOption,
-			@RequestParam(required=true) String year,
-			@RequestParam(required = true) String userEmail){
-		
-		try {
-			UserEntity user = userRepository.findByUserEmail(userEmail).get();
-			Integer yearInt = Integer.parseInt(year);
-			
-			if(daysOption.equals("total")) {
-				Integer totalDays = employeeService.searchTotalVacationDays(yearInt, user.getId());
-				
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(totalDays.toString()));
-		
-			}else if(daysOption.equals("used")) {
-				Integer usedDays = employeeService.searchUsedVacationDays(yearInt, user.getId());
-				
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(usedDays.toString()));
-				
-			}else if(daysOption.equals("available")) {
-				Integer totalDays = employeeService.searchTotalVacationDays(yearInt, user.getId());
-				Integer usedDays = employeeService.searchUsedVacationDays(yearInt, user.getId());
-				Integer availableDays = totalDays - usedDays;
-				Integer availableDaysPositive = -availableDays;
-				
-				if(availableDays<=0) {
-					return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage
-						("The user has used more vacation days than intended: " + availableDaysPositive.toString() +
-						"! User has no more available vacation days!"));
-				}
-				
-				return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(availableDays.toString()));
-			}
 	
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}catch(Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}
 	
 	@GetMapping("/searchUsedVacationDays")
 	public ResponseEntity<List<UsedVacationDTO>> searchUsedVacationDays(
@@ -148,26 +109,6 @@ public class EmployeeController {
 			page = employeeService.search(CSVUtil.getLocalDate(dateFromParam, DATE_FORMAT), CSVUtil.getLocalDate(dateToParam, DATE_FORMAT), user.getId(), pageNo);
 			
 			return new ResponseEntity<>(toUVDTO.convert(page.getContent()), HttpStatus.OK);
-		}catch(Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}
-	
-	@GetMapping("/adminSearchUsedVacationDays")
-	public ResponseEntity<List<UsedVacationDTO>> adminSearchUsedVacationDays(
-			@RequestParam(required=false) String dateFromParam,
-            @RequestParam(required=false) String dateToParam,
-            @RequestParam(required=true) String userEmailParam,
-            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo){
-		
-		Page<UsedVacation> page;
-		
-		try {
-			UserEntity user = userRepository.findByUserEmail(userEmailParam).get();
-			page = employeeService.search(CSVUtil.getLocalDate(dateFromParam, DATE_FORMAT), CSVUtil.getLocalDate(dateToParam, DATE_FORMAT), user.getId(), pageNo);
-
-			return new ResponseEntity<>(toUVDTO.convert(page.getContent()), HttpStatus.OK);
-			
 		}catch(Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
@@ -197,41 +138,31 @@ public class EmployeeController {
 			}
 			
 			if(startDate.getYear() == endDate.getYear()){
+				
 				Integer year = startDate.getYear();
 				
-				Integer totalDays = employeeService.searchTotalVacationDays(year, user.getId());
-				Integer usedDays = employeeService.searchUsedVacationDays(year, user.getId());
-				Integer availableDays = totalDays - usedDays;
-
-				if(availableDays < ChronoUnit.DAYS.between(startDate, endDate)+1) {
+				if (!hasMoreAvailableDays(year, user, startDate, endDate)){
 					message = "The user has no more available vacation days for this year!";
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
 				}
 			}else if(startDate.getYear() < endDate.getYear()) {
-				Integer year1=(startDate.getYear());
 				
-				Integer totalDays1 = employeeService.searchTotalVacationDays(year1, user.getId());
-				Integer usedDays1 = employeeService.searchUsedVacationDays(year1, user.getId());
-				Integer availableDays1 = totalDays1 - usedDays1;
+				Integer year1 = startDate.getYear();
 				LocalDate lastDay = LocalDate.of(year1, 12, 31);
 				
-				if(availableDays1 < ChronoUnit.DAYS.between(startDate, lastDay)+1) {
-					message = "The user has no more available vacation days for this year!";
+				if (!hasMoreAvailableDays(year1, user, startDate, lastDay)){
+					message = "The user has no more available vacation days for "+year1+" year!";
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
 				}
 				
 				Integer year2=(endDate.getYear());
-				
-				Integer totalDays2 = employeeService.searchTotalVacationDays(year2, user.getId());
-				Integer usedDays2 = employeeService.searchUsedVacationDays(year2, user.getId());
-				Integer availableDays2 = totalDays2 - usedDays2;
 				LocalDate firstDay = LocalDate.of(year2, 01, 01);
 				
-				if(availableDays2 < ChronoUnit.DAYS.between(firstDay, lastDay)+1) {
-					message = "The user has no more available vacation days for this year!";
+				if(!hasMoreAvailableDays(year2, user, startDate, firstDay)) {
+					message = "The user has no more available vacation days for "+year2+" year!";
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
 				}
-				
+								
 			}
 	
 			UsedVacation usedVacation = new UsedVacation(CSVUtil.getLocalDate(usedVacationDTO.getVacationStartDate(), DATE_FORMAT), 
@@ -269,5 +200,17 @@ public class EmployeeController {
 		}catch (Exception e) {
 			return false;
 		}
+	}
+	
+	public boolean hasMoreAvailableDays(Integer year, UserEntity user, LocalDate startDate, LocalDate endDate) {
+		
+		Integer totalDays = employeeService.searchTotalVacationDays(year, user.getId());
+		Integer usedDays = employeeService.searchUsedVacationDays(year, user.getId());
+		Integer availableDays = totalDays - usedDays;
+
+		if (availableDays < (ChronoUnit.DAYS.between(startDate, endDate)+1)) {
+			return false;
+		}
+		return true;
 	}
 }
